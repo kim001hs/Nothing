@@ -1,0 +1,74 @@
+#include <iostream>
+#include <vector>
+#include <set>
+#include <sstream>
+#include <algorithm>
+
+using namespace std;
+
+int main() {
+    // 전체 집합 입력 받기
+    string input;
+    getline(cin, input);
+    istringstream iss(input);
+    vector<int> U;
+    int num;
+    while (iss >> num) {
+        U.push_back(num);
+    }
+
+    // 부분 집합 개수 입력 받기
+    int n;
+    cin >> n;
+    cin.ignore();  // 개행 문자 처리
+
+    // 부분 집합 배열 생성
+    vector<vector<int>> arr(n + 1);
+
+    // 부분 집합 입력받기
+    for (int i = 1; i <= n; i++) {
+        getline(cin, input);  // 부분 집합 입력
+        istringstream iss(input);
+        while (iss >> num) {
+            arr[i].push_back(num);
+        }
+    }
+
+    int total = 0;
+
+    // 집합 커버 알고리즘 시작
+    while (!U.empty()) {
+        int maxSize_num = 0;
+
+        // 가장 큰 부분 집합을 찾기
+        for (int i = 1; i <= n; i++) {
+            if (maxSize_num == 0 || arr[i].size() > arr[maxSize_num].size()) {
+                maxSize_num = i;
+            }
+        }
+
+        set<int> covered(arr[maxSize_num].begin(), arr[maxSize_num].end());
+        arr[maxSize_num].clear();
+
+        // U에서 덮은 부분 제거
+        U.erase(remove_if(U.begin(), U.end(), [&](int x) {
+            return covered.find(x) != covered.end();
+        }), U.end());
+
+        // 다른 부분 집합에서 덮은 요소 제거
+        for (int i = 1; i <= n; i++) {
+            if (i == maxSize_num) continue;
+            arr[i].erase(remove_if(arr[i].begin(), arr[i].end(), [&](int x) {
+                return covered.find(x) != covered.end();
+            }), arr[i].end());
+        }
+
+        // 결과 출력 및 카운트 증가
+        cout << maxSize_num << " ";
+        total++;
+    }
+
+    cout << "\n" << total;
+
+    return 0;
+}
