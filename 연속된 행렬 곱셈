@@ -1,0 +1,43 @@
+#include<iostream>
+#include<algorithm>
+#include<vector>
+using namespace std;
+int dpS[1001][1001];
+int dpT[1001][1001];
+void optimal_order(int T[][1001], int i,int j);
+
+int main(){
+    cin.tie(NULL);
+    ios::sync_with_stdio(false);
+    int n;
+    cin >> n;
+    vector<pair<int,int>> arr;//first: row, second: column
+    arr.push_back(make_pair(0,0));//0,0은 사용하지 않을 것이므로 0으로 초기화
+    for(int i=0;i<n;i++){//행렬의 개수만큼 입력받기
+        int temp1,temp2;
+        cin>>temp1>>temp2;
+        arr.push_back(make_pair(temp1,temp2));
+    }
+    for(int j=1;j<n;j++){//j는 곱할 행렬의 개수-1
+        for(int i=1;i+j<=n;i++){//i는 시작점
+            for(int k=i;k<=i+j-1;k++){//k는 곱할 행렬의 기준점
+                if(dpS[i][i+j]==0||dpS[i][i+j]>(dpS[i][k]+dpS[k+1][i+j]+arr[i].first*arr[i].second*arr[i+j].second)){//0이거나 더 작은 값이 나오면 갱신
+                    dpS[i][i+j]=dpS[i][k]+dpS[k+1][i+j]+arr[i].first*arr[k].second*arr[i+j].second;
+                    dpT[i][i+j]=k;//k를 저장
+                }
+            }
+        }
+    }
+
+    cout<<dpS[1][n]<<"\n";
+    optimal_order(dpT,1,n);
+}
+void optimal_order(int T[][1001], int i,int j){
+    if(i==j)printf("M%d",i);//시작점과 끝점이 같으면 Mi 출력
+    else{//아니면 괄호를 쳐서 출력
+        printf("(");
+        optimal_order(T,i,T[i][j]);
+        optimal_order(T,T[i][j]+1,j);
+        printf(")");
+    }
+}
