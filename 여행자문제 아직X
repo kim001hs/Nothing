@@ -1,0 +1,51 @@
+#include<iostream>
+#include<queue>
+#include<tuple>
+#include<vector>
+using namespace std;
+
+int map[1001][1001];
+vector<pair<int, int>> visit;
+bool visited[1001];
+
+void bfs(int n) {
+    visited[0] = true;
+    priority_queue<tuple<int, int, int>, vector<tuple<int, int, int>>, greater<>> pq;
+    for (int i = 0; i < n; i++) {
+        pq.push(make_tuple(map[0][i], 0, i));
+    }
+    while (!pq.empty()) {
+        int distance = get<0>(pq.top());
+        int start = get<1>(pq.top());
+        int spot = get<2>(pq.top());
+        pq.pop();
+        if (!visited[spot]) {
+            visited[spot] = true;
+            visit.push_back(make_pair(start, spot));
+            if (visit.size() == n - 1) return;
+            for (int i = 0; i < n; i++) {
+                if (!visited[i]) pq.push(make_tuple(map[spot][i], spot, i));
+            }
+        }
+    }
+}
+int main() {
+	int n;
+	cin >> n;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> map[i][j];
+        }
+    }
+    bfs(n);
+    cout << "MST: ";
+    for (int i = 0; i < n - 1; i++) {
+        cout << "(" << visit[i].first << ", " << visit[i].second << ") ";
+    }
+    cout << "\n방문 경로: 0 ";
+    for (int i = 0; i < n - 1; i++) {
+        cout << visit[i].second << " ";
+    }
+    cout << "0 ";
+    return 0;
+}
